@@ -4,6 +4,9 @@ import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Services.Pipewire
 import Quickshell.Services.UPower
+import Quickshell.Networking
+import Quickshell.Bluetooth
+import Quickshell.Services.SystemTray
 import ".."
 
 Variants {
@@ -123,6 +126,64 @@ Variants {
 
                 Row {
                     spacing: 12
+
+                    Text {
+                        text: Networking.active ? "󰖩" : "󰖪"
+                        color: Networking.active ? Theme.text : Theme.subtext
+                        font.family: Theme.mono
+                        visible: Networking.active
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: Quickshell.execDetached([
+                                "qs", "ipc", "call", "controlCenter", "toggle"
+                            ])
+                        }
+                    }
+
+                    Text {
+                        text: "󰂯"
+                        color: Theme.text
+                        font.family: Theme.mono
+                        visible: Bluetooth.defaultAdapter
+                            && Bluetooth.defaultAdapter.enabled
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: Quickshell.execDetached([
+                                "qs", "ipc", "call", "controlCenter", "toggle"
+                            ])
+                        }
+                    }
+
+                    Repeater {
+                        model: SystemTray.items
+
+                        Item {
+                            required property var modelData
+                            width: 20
+                            height: 24
+
+                            Image {
+                                anchors.centerIn: parent
+                                width: 18
+                                height: 18
+                                source: modelData.icon
+                                fillMode: Image.PreserveAspectFit
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                                onClicked: mouse => {
+                                    if (mouse.button === Qt.RightButton)
+                                        modelData.secondaryActivate()
+                                    else
+                                        modelData.activate()
+                                }
+                            }
+                        }
+                    }
 
                     Text {
                         readonly property bool muted: sink && sink.audio ? sink.audio.muted : false
