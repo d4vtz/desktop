@@ -1,6 +1,5 @@
 import QtQuick
 import Quickshell
-import Quickshell.Ipc
 import Quickshell.Io
 import ".."
 
