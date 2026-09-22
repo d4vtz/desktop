@@ -70,28 +70,37 @@ Variants {
                                 return null
                             }
 
-                            color: workspace && workspace.focused
+                            readonly property bool isFocused: Hyprland.focusedWorkspace
+                                && Hyprland.focusedWorkspace.id === index + 1
+                            readonly property bool isOccupied: workspace
+                                && workspace.toplevels
+                                && workspace.toplevels.count > 0
+
+                            color: isFocused
                                 ? Theme.blue
-                                : workspace && workspace.toplevels.count > 0
+                                : isOccupied
                                     ? Theme.surface1
                                     : Theme.surface0
 
                             Text {
                                 anchors.centerIn: parent
                                 text: index + 1
-                                color: parent.workspace && parent.workspace.focused
-                                    ? Theme.crust
-                                    : Theme.text
+                                color: parent.isFocused ? Theme.crust : Theme.text
                                 font.family: Theme.mono
                             }
 
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: {
-                                    if (parent.workspace)
+                                    if (parent.workspace) {
                                         parent.workspace.activate()
-                                    else
-                                        Hyprland.dispatch("workspace " + (index + 1))
+                                    } else {
+                                        Quickshell.execDetached([
+                                            "hyprctl",
+                                            "dispatch",
+                                            "hl.dsp.focus({ workspace = \"" + (index + 1) + "\" })"
+                                        ])
+                                    }
                                 }
                             }
                         }
