@@ -119,7 +119,7 @@ Variants {
                             Text {
                                 anchors.centerIn: parent
                                 text: index + 1
-                                color: parent.isFocused ? Theme.onPrimary : Theme.foregroundVariant
+                                color: parent.isFocused ? Theme.primaryForeground : Theme.foregroundVariant
                                 font.family: Theme.font
                                 font.pixelSize: 12
                                 font.bold: parent.isFocused
