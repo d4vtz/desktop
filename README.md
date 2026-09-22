@@ -1,18 +1,26 @@
 # d4vtz/desktop
 
-Entorno de escritorio Wayland reproducible para Arch Linux.
+Entorno Wayland reproducible para Arch Linux, construido desde cero alrededor de **Hyprland Lua + Quickshell**.
 
-## Arquitectura
+## Stack
 
-- **Hyprland >= 0.55** configurado nativamente en **Lua**.
-- **Quickshell** como shell de escritorio.
-- **UWSM** para gestionar la sesión y el entorno.
-- **PipeWire/WirePlumber**, NetworkManager, BlueZ y power-profiles-daemon.
-- Catppuccin Mocha, Papirus Dark, Noto Sans y JetBrainsMono Nerd Font.
+Hyprland >= 0.55 (Lua), UWSM, Quickshell 0.3.x, Kitty, PipeWire/WirePlumber, NetworkManager, BlueZ, power-profiles-daemon, Hyprlock/Hypridle/Hyprpaper, Catppuccin Mocha, Papirus Dark y JetBrainsMono Nerd Font.
 
-Hyprland se divide en módulos Lua independientes bajo `config/hypr/modules/`. El punto de entrada es `config/hypr/hyprland.lua`.
+## Funciones
 
-Las variables de entorno de sesión viven en `config/uwsm/env`, no en Hyprland, para respetar el modelo de UWSM.
+- 7 workspaces persistentes.
+- Barra Quickshell con workspaces, reloj, volumen y batería.
+- Launcher por IPC.
+- Control Center con red, Bluetooth, audio, brillo y perfiles de energía.
+- Servidor de notificaciones Quickshell.
+- Historial de portapapeles con cliphist.
+- Menú de sesión.
+- Capturas con grim/slurp.
+- Bloqueo e inactividad.
+- Atajos multimedia.
+- Configuración Hyprland modular en Lua.
+- Entorno de sesión separado en UWSM.
+- Backups automáticos durante instalación.
 
 ## Instalación
 
@@ -23,16 +31,35 @@ chmod +x install.sh
 ./install.sh
 ```
 
-Después inicia la sesión con:
+Inicia con:
 
 ```bash
 uwsm start hyprland.desktop
 ```
 
-## Desarrollo Lua
+## Atajos principales
 
-El repositorio incluye `.luarc.json` apuntando a `/usr/share/hypr/stubs`, por lo que lua-language-server puede conocer la API `hl` de Hyprland.
+| Atajo | Acción |
+|---|---|
+| Super+Enter | Kitty |
+| Super+Space | Launcher |
+| Super+C | Clipboard |
+| Super+A | Control Center |
+| Super+Q | Cerrar ventana |
+| Super+F | Fullscreen |
+| Super+V | Floating |
+| Super+P | Pseudotile |
+| Super+1…7 | Workspace |
+| Super+Shift+1…7 | Mover ventana |
+| Super+flechas | Cambiar foco |
+| Super+Shift+flechas | Mover ventana |
+| Super+Shift+L | Bloquear |
+| Super+Shift+E | Sesión |
+| Print | Captura de región |
+| Shift+Print | Captura completa |
 
-## Estado
+## Desarrollo
 
-La base de Hyprland/UWSM ya está estructurada. La siguiente capa del proyecto es la shell Quickshell modular: barra, launcher, control center, notificaciones, clipboard y menú de sesión.
+`.luarc.json` añade `/usr/share/hypr/stubs` a lua-language-server para completar la API `hl`.
+
+La shell está separada del compositor: Hyprland controla ventanas, input y workspaces; Quickshell controla la experiencia de escritorio. Los procesos externos nunca se ejecutan de forma bloqueante dentro de callbacks Lua.
