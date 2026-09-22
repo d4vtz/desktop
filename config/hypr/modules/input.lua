@@ -9,8 +9,10 @@ hl.config({
       disable_while_typing = true,
     },
   },
-  gestures = {
-    workspace_swipe = true,
-    workspace_swipe_fingers = 3,
-  },
+})
+
+hl.gesture({
+  fingers = 3,
+  direction = "horizontal",
+  action = "workspace",
 })
