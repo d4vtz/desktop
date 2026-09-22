@@ -14,12 +14,11 @@ Variants {
 
     PanelWindow {
         required property var modelData
-
         readonly property var sink: Pipewire.defaultAudioSink
         readonly property var battery: UPower.displayDevice
 
         screen: modelData
-        implicitHeight: 42
+        implicitHeight: 48
         color: "transparent"
 
         anchors {
@@ -39,30 +38,54 @@ Variants {
 
         Rectangle {
             anchors.fill: parent
-            anchors.margins: 6
-            anchors.bottomMargin: 0
-            radius: Theme.radius
-            color: Theme.base
-            border.color: Theme.surface1
+            anchors.leftMargin: 8
+            anchors.rightMargin: 8
+            anchors.topMargin: 5
+            anchors.bottomMargin: 3
+            radius: Theme.radiusLarge
+            color: Theme.surface
+            border.color: Theme.surfaceContainerHigh
             border.width: 1
 
             RowLayout {
                 anchors.fill: parent
-                anchors.leftMargin: 12
-                anchors.rightMargin: 12
-                spacing: 10
+                anchors.leftMargin: Theme.spacingS
+                anchors.rightMargin: Theme.spacingS
+                spacing: Theme.spacingS
+
+                Rectangle {
+                    implicitWidth: 38
+                    implicitHeight: 32
+                    radius: 16
+                    color: Theme.surfaceContainerHigh
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "󰣇"
+                        color: Theme.primary
+                        font.family: Theme.mono
+                        font.pixelSize: 18
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: Quickshell.execDetached([
+                            "qs", "ipc", "call", "launcher", "toggle"
+                        ])
+                    }
+                }
 
                 Row {
-                    spacing: 5
+                    spacing: Theme.spacingXS
 
                     Repeater {
                         model: 7
 
                         Rectangle {
                             required property int index
-                            width: 25
-                            height: 25
-                            radius: 8
+                            width: isFocused ? 30 : 24
+                            height: 24
+                            radius: 12
 
                             readonly property var workspace: {
                                 for (let i = 0; i < Hyprland.workspaces.count; ++i) {
@@ -80,16 +103,26 @@ Variants {
                                 && workspace.toplevels.count > 0
 
                             color: isFocused
-                                ? Theme.blue
+                                ? Theme.primary
                                 : isOccupied
-                                    ? Theme.surface1
-                                    : Theme.surface0
+                                    ? Theme.surfaceContainerHighest
+                                    : "transparent"
+
+                            Behavior on width {
+                                NumberAnimation { duration: 140 }
+                            }
+
+                            Behavior on color {
+                                ColorAnimation { duration: 140 }
+                            }
 
                             Text {
                                 anchors.centerIn: parent
                                 text: index + 1
-                                color: parent.isFocused ? Theme.crust : Theme.text
-                                font.family: Theme.mono
+                                color: parent.isFocused ? Theme.onPrimary : Theme.onSurfaceVariant
+                                font.family: Theme.font
+                                font.pixelSize: 12
+                                font.bold: parent.isFocused
                             }
 
                             MouseArea {
@@ -114,112 +147,146 @@ Variants {
                     Layout.fillWidth: true
                 }
 
-                Text {
-                    color: Theme.text
-                    font.family: Theme.font
-                    text: Qt.formatDateTime(clock.date, "ddd dd MMM  HH:mm")
+                Rectangle {
+                    implicitWidth: clockText.implicitWidth + 24
+                    implicitHeight: 32
+                    radius: 16
+                    color: clockMouse.containsMouse
+                        ? Theme.surfaceContainerHigh
+                        : Theme.surfaceContainer
+
+                    Behavior on color {
+                        ColorAnimation { duration: 120 }
+                    }
+
+                    Text {
+                        id: clockText
+                        anchors.centerIn: parent
+                        text: Qt.formatDateTime(clock.date, "h:mm AP  ·  ddd d MMM")
+                        color: Theme.onSurface
+                        font.family: Theme.font
+                        font.pixelSize: 13
+                        font.weight: Font.Medium
+                    }
+
+                    MouseArea {
+                        id: clockMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                    }
                 }
 
                 Item {
                     Layout.fillWidth: true
                 }
 
-                Row {
-                    spacing: 12
+                Rectangle {
+                    implicitWidth: systemRow.implicitWidth + 20
+                    implicitHeight: 32
+                    radius: 16
+                    color: systemMouse.containsMouse
+                        ? Theme.surfaceContainerHigh
+                        : Theme.surfaceContainer
 
-                    Text {
-                        text: Networking.active ? "󰖩" : "󰖪"
-                        color: Networking.active ? Theme.text : Theme.subtext
-                        font.family: Theme.mono
-                        visible: Networking.active
-
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: Quickshell.execDetached([
-                                "qs", "ipc", "call", "controlCenter", "toggle"
-                            ])
-                        }
+                    Behavior on color {
+                        ColorAnimation { duration: 120 }
                     }
 
-                    Text {
-                        text: "󰂯"
-                        color: Theme.text
-                        font.family: Theme.mono
-                        visible: Bluetooth.defaultAdapter
-                            && Bluetooth.defaultAdapter.enabled
+                    Row {
+                        id: systemRow
+                        anchors.centerIn: parent
+                        spacing: 10
 
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: Quickshell.execDetached([
-                                "qs", "ipc", "call", "controlCenter", "toggle"
-                            ])
-                        }
-                    }
+                        Repeater {
+                            model: SystemTray.items
 
-                    Repeater {
-                        model: SystemTray.items
-
-                        Item {
-                            required property var modelData
-                            width: 20
-                            height: 24
-
-                            Image {
-                                anchors.centerIn: parent
+                            Item {
+                                required property var modelData
                                 width: 18
-                                height: 18
-                                source: modelData.icon
-                                fillMode: Image.PreserveAspectFit
-                            }
+                                height: 22
 
-                            MouseArea {
-                                anchors.fill: parent
-                                acceptedButtons: Qt.LeftButton | Qt.RightButton
-                                onClicked: mouse => {
-                                    if (mouse.button === Qt.RightButton)
-                                        modelData.secondaryActivate()
-                                    else
-                                        modelData.activate()
+                                Image {
+                                    anchors.centerIn: parent
+                                    width: 16
+                                    height: 16
+                                    source: modelData.icon
+                                    fillMode: Image.PreserveAspectFit
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+                                    onClicked: mouse => {
+                                        if (mouse.button === Qt.RightButton)
+                                            modelData.secondaryActivate()
+                                        else
+                                            modelData.activate()
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    Text {
-                        readonly property bool muted: sink && sink.audio ? sink.audio.muted : false
-                        readonly property int volume: sink && sink.audio
-                            ? Math.round(sink.audio.volume * 100)
-                            : 0
+                        Text {
+                            text: Networking.active ? "󰖩" : "󰖪"
+                            color: Networking.active ? Theme.onSurface : Theme.onSurfaceVariant
+                            font.family: Theme.mono
+                            font.pixelSize: 15
+                        }
 
-                        text: (muted ? "󰖁 " : volume >= 50 ? "󰕾 " : volume > 0 ? "󰖀 " : "󰕿 ")
-                            + volume + "%"
-                        color: muted ? Theme.subtext : Theme.text
-                        font.family: Theme.mono
+                        Text {
+                            text: "󰂯"
+                            color: Theme.onSurface
+                            font.family: Theme.mono
+                            font.pixelSize: 15
+                            visible: Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled
+                        }
 
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: {
-                                if (sink && sink.audio)
-                                    sink.audio.muted = !sink.audio.muted
+                        Text {
+                            readonly property bool muted: sink && sink.audio ? sink.audio.muted : false
+                            readonly property int volume: sink && sink.audio
+                                ? Math.round(sink.audio.volume * 100)
+                                : 0
+
+                            text: muted ? "󰖁" : volume >= 50 ? "󰕾" : volume > 0 ? "󰖀" : "󰕿"
+                            color: muted ? Theme.onSurfaceVariant : Theme.onSurface
+                            font.family: Theme.mono
+                            font.pixelSize: 15
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    if (sink && sink.audio)
+                                        sink.audio.muted = !sink.audio.muted
+                                }
+                                onWheel: wheel => {
+                                    if (!sink || !sink.audio)
+                                        return
+                                    const step = wheel.angleDelta.y > 0 ? 0.05 : -0.05
+                                    sink.audio.volume = Math.max(0, Math.min(1.5, sink.audio.volume + step))
+                                }
                             }
-                            onWheel: wheel => {
-                                if (!sink || !sink.audio)
-                                    return
-                                const step = wheel.angleDelta.y > 0 ? 0.05 : -0.05
-                                sink.audio.volume = Math.max(0, Math.min(1.5, sink.audio.volume + step))
-                            }
+                        }
+
+                        Text {
+                            readonly property real percentage: battery && battery.ready
+                                ? battery.percentage
+                                : 0
+                            text: "󰁹 " + Math.round(percentage) + "%"
+                            color: Theme.onSurface
+                            font.family: Theme.mono
+                            font.pixelSize: 13
+                            visible: battery && battery.isLaptopBattery
                         }
                     }
 
-                    Text {
-                        readonly property real percentage: battery && battery.ready
-                            ? battery.percentage
-                            : 0
-
-                        text: "󰁹 " + Math.round(percentage) + "%"
-                        color: Theme.text
-                        font.family: Theme.mono
-                        visible: battery && battery.isLaptopBattery
+                    MouseArea {
+                        id: systemMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        propagateComposedEvents: true
+                        onClicked: Quickshell.execDetached([
+                            "qs", "ipc", "call", "controlCenter", "toggle"
+                        ])
                     }
                 }
             }
