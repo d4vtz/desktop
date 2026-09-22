@@ -173,6 +173,9 @@ Variants {
                         id: clockMouse
                         anchors.fill: parent
                         hoverEnabled: true
+                        onClicked: Quickshell.execDetached([
+                            "qs", "ipc", "call", "dashboard", "toggle"
+                        ])
                     }
                 }
 
