@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+dir="$HOME/Pictures/Screenshots"
+mkdir -p "$dir"
+file="$dir/$(date +'%Y-%m-%d_%H-%M-%S').png"
+case "${1:-area}" in
+  area) geometry="$(slurp)" || exit 0; grim -g "$geometry" "$file" ;;
+  screen) grim "$file" ;;
+  *) printf 'Uso: %s {area|screen}\n' "$0" >&2; exit 2 ;;
+esac
+wl-copy < "$file"
+notify-send "Captura guardada" "$file"
