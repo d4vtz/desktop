@@ -119,7 +119,7 @@ Variants {
                             Text {
                                 anchors.centerIn: parent
                                 text: index + 1
-                                color: parent.isFocused ? Theme.onPrimary : Theme.onSurfaceVariant
+                                color: parent.isFocused ? Theme.onPrimary : Theme.foregroundVariant
                                 font.family: Theme.font
                                 font.pixelSize: 12
                                 font.bold: parent.isFocused
@@ -163,7 +163,7 @@ Variants {
                         id: clockText
                         anchors.centerIn: parent
                         text: Qt.formatDateTime(clock.date, "h:mm AP  ·  ddd d MMM")
-                        color: Theme.onSurface
+                        color: Theme.foreground
                         font.family: Theme.font
                         font.pixelSize: 13
                         font.weight: Font.Medium
@@ -228,14 +228,14 @@ Variants {
 
                         Text {
                             text: Networking.active ? "󰖩" : "󰖪"
-                            color: Networking.active ? Theme.onSurface : Theme.onSurfaceVariant
+                            color: Networking.active ? Theme.foreground : Theme.foregroundVariant
                             font.family: Theme.mono
                             font.pixelSize: 15
                         }
 
                         Text {
                             text: "󰂯"
-                            color: Theme.onSurface
+                            color: Theme.foreground
                             font.family: Theme.mono
                             font.pixelSize: 15
                             visible: Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled
@@ -248,7 +248,7 @@ Variants {
                                 : 0
 
                             text: muted ? "󰖁" : volume >= 50 ? "󰕾" : volume > 0 ? "󰖀" : "󰕿"
-                            color: muted ? Theme.onSurfaceVariant : Theme.onSurface
+                            color: muted ? Theme.foregroundVariant : Theme.foreground
                             font.family: Theme.mono
                             font.pixelSize: 15
 
@@ -272,7 +272,7 @@ Variants {
                                 ? battery.percentage
                                 : 0
                             text: "󰁹 " + Math.round(percentage) + "%"
-                            color: Theme.onSurface
+                            color: Theme.foreground
                             font.family: Theme.mono
                             font.pixelSize: 13
                             visible: battery && battery.isLaptopBattery
