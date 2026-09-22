@@ -5,9 +5,9 @@ QtObject {
     // Material 3-style tokens. Fixed dark palette for now; later these can
     // be populated by wallpaper-derived colors without changing components.
     readonly property color primary: "#cbbdff"
-    readonly property color onPrimary: "#30275a"
+    readonly property color primaryForeground: "#30275a"
     readonly property color primaryContainer: "#4a416f"
-    readonly property color onPrimaryContainer: "#e7deff"
+    readonly property color primaryContainerForeground: "#e7deff"
 
     readonly property color surface: "#121116"
     readonly property color surfaceContainer: "#1b1a20"
@@ -20,7 +20,7 @@ QtObject {
 
     // Compatibility aliases while older modules are migrated.
     readonly property color base: surface
-    readonly property color crust: onPrimary
+    readonly property color crust: primaryForeground
     readonly property color surface0: surfaceContainer
     readonly property color surface1: surfaceContainerHigh
     readonly property color text: foreground
