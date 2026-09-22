@@ -36,3 +36,6 @@ hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl set 5%-"))
 hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"))
 hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"))
 hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"))
+
+hl.bind("SUPER + C", hl.dsp.exec_cmd("qs ipc call clipboard toggle"), { description = "Clipboard" })
+hl.bind("SUPER + A", hl.dsp.exec_cmd("qs ipc call controlCenter toggle"), { description = "Control Center" })
