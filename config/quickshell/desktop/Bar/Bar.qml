@@ -2,7 +2,8 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Hyprland
-import Quickshell.Io
+import Quickshell.Services.Pipewire
+import Quickshell.Services.UPower
 import ".."
 
 Variants {
@@ -10,6 +11,9 @@ Variants {
 
     PanelWindow {
         required property var modelData
+
+        readonly property var sink: Pipewire.defaultAudioSink
+        readonly property var battery: UPower.displayDevice
 
         screen: modelData
         implicitHeight: 42
@@ -19,6 +23,15 @@ Variants {
             top: true
             left: true
             right: true
+        }
+
+        PwObjectTracker {
+            objects: [sink]
+        }
+
+        SystemClock {
+            id: clock
+            precision: SystemClock.Minutes
         }
 
         Rectangle {
@@ -47,20 +60,39 @@ Variants {
                             width: 25
                             height: 25
                             radius: 8
-                            color: Hyprland.focusedWorkspace && Hyprland.focusedWorkspace.id === index + 1
+
+                            readonly property var workspace: {
+                                for (let i = 0; i < Hyprland.workspaces.count; ++i) {
+                                    const ws = Hyprland.workspaces.get(i)
+                                    if (ws.id === index + 1)
+                                        return ws
+                                }
+                                return null
+                            }
+
+                            color: workspace && workspace.focused
                                 ? Theme.blue
-                                : Theme.surface0
+                                : workspace && workspace.toplevels.count > 0
+                                    ? Theme.surface1
+                                    : Theme.surface0
 
                             Text {
                                 anchors.centerIn: parent
                                 text: index + 1
-                                color: parent.color === Theme.blue ? Theme.crust : Theme.text
+                                color: parent.workspace && parent.workspace.focused
+                                    ? Theme.crust
+                                    : Theme.text
                                 font.family: Theme.mono
                             }
 
                             MouseArea {
                                 anchors.fill: parent
-                                onClicked: Hyprland.dispatch("workspace " + (index + 1))
+                                onClicked: {
+                                    if (parent.workspace)
+                                        parent.workspace.activate()
+                                    else
+                                        Hyprland.dispatch("workspace " + (index + 1))
+                                }
                             }
                         }
                     }
@@ -71,55 +103,53 @@ Variants {
                 }
 
                 Text {
-                    id: clock
                     color: Theme.text
                     font.family: Theme.font
-                    text: Qt.formatDateTime(new Date(), "ddd dd MMM  HH:mm")
-
-                    Timer {
-                        interval: 1000
-                        repeat: true
-                        running: true
-                        onTriggered: clock.text = Qt.formatDateTime(new Date(), "ddd dd MMM  HH:mm")
-                    }
+                    text: Qt.formatDateTime(clock.date, "ddd dd MMM  HH:mm")
                 }
 
                 Item {
                     Layout.fillWidth: true
                 }
 
-                Text {
-                    id: status
-                    color: Theme.text
-                    font.family: Theme.mono
-                    text: "󰕾 --%   󰁹 --%"
+                Row {
+                    spacing: 12
 
-                    Process {
-                        id: statusProcess
-                        command: [
-                            "sh",
-                            "-c",
-                            "v=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null | awk '{printf \"%d\", $2*100}'); b=$(cat /sys/class/power_supply/BAT*/capacity 2>/dev/null | head -1); printf '󰕾 %s%%   󰁹 %s%%' \"$v\" \"$b\""
-                        ]
+                    Text {
+                        readonly property bool muted: sink && sink.audio ? sink.audio.muted : false
+                        readonly property int volume: sink && sink.audio
+                            ? Math.round(sink.audio.volume * 100)
+                            : 0
 
-                        stdout: StdioCollector {
-                            onStreamFinished: status.text = text.trim()
+                        text: (muted ? "󰖁 " : volume >= 50 ? "󰕾 " : volume > 0 ? "󰖀 " : "󰕿 ")
+                            + volume + "%"
+                        color: muted ? Theme.subtext : Theme.text
+                        font.family: Theme.mono
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                if (sink && sink.audio)
+                                    sink.audio.muted = !sink.audio.muted
+                            }
+                            onWheel: wheel => {
+                                if (!sink || !sink.audio)
+                                    return
+                                const step = wheel.angleDelta.y > 0 ? 0.05 : -0.05
+                                sink.audio.volume = Math.max(0, Math.min(1.5, sink.audio.volume + step))
+                            }
                         }
                     }
 
-                    Timer {
-                        interval: 3000
-                        repeat: true
-                        running: true
-                        triggeredOnStart: true
-                        onTriggered: statusProcess.running = true
-                    }
+                    Text {
+                        readonly property real percentage: battery && battery.ready
+                            ? battery.percentage
+                            : 0
 
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: Quickshell.execDetached([
-                            "qs", "ipc", "call", "controlCenter", "toggle"
-                        ])
+                        text: "󰁹 " + Math.round(percentage) + "%"
+                        color: Theme.text
+                        font.family: Theme.mono
+                        visible: battery && battery.isLaptopBattery
                     }
                 }
             }
