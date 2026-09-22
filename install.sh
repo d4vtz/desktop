@@ -17,8 +17,11 @@ link() {
 }
 link "$ROOT/config/hypr" "$HOME/.config/hypr"
 link "$ROOT/config/uwsm" "$HOME/.config/uwsm"
+link "$ROOT/config/quickshell" "$HOME/.config/quickshell"
+link "$ROOT/config/kitty" "$HOME/.config/kitty"
+link "$ROOT/config/desktop" "$HOME/.config/desktop"
 link "$ROOT/scripts/screenshot" "$HOME/.local/bin/screenshot"
-chmod +x "$ROOT/scripts/screenshot"
+for script in "$ROOT"/scripts/*; do chmod +x "$script"; link "$script" "$HOME/.local/bin/$(basename "$script")"; done
 sudo systemctl enable --now NetworkManager.service bluetooth.service
 sudo systemctl enable --now power-profiles-daemon.service || true
 echo "Instalación base terminada. Backup: $BACKUP"
