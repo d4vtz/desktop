@@ -13,8 +13,8 @@ QtObject {
     readonly property color surfaceContainer: "#1b1a20"
     readonly property color surfaceContainerHigh: "#252329"
     readonly property color surfaceContainerHighest: "#302e35"
-    readonly property color onSurface: "#e7e1e9"
-    readonly property color onSurfaceVariant: "#cac4cf"
+    readonly property color foreground: "#e7e1e9"
+    readonly property color foregroundVariant: "#cac4cf"
     readonly property color outline: "#938f99"
     readonly property color error: "#ffb4ab"
 
@@ -23,8 +23,8 @@ QtObject {
     readonly property color crust: onPrimary
     readonly property color surface0: surfaceContainer
     readonly property color surface1: surfaceContainerHigh
-    readonly property color text: onSurface
-    readonly property color subtext: onSurfaceVariant
+    readonly property color text: foreground
+    readonly property color subtext: foregroundVariant
     readonly property color blue: primary
     readonly property color red: error
 
