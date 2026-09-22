@@ -1,10 +1,47 @@
 pragma Singleton
 import QtQuick
+
 QtObject {
- readonly property color base:"#1e1e2e"; readonly property color crust:"#11111b"
- readonly property color surface0:"#313244"; readonly property color surface1:"#45475a"
- readonly property color text:"#cdd6f4"; readonly property color subtext:"#a6adc8"
- readonly property color blue:"#89b4fa"; readonly property color red:"#f38ba8"
- readonly property string font:"Noto Sans"; readonly property string mono:"JetBrainsMono Nerd Font"
- readonly property int radius:12
+    // Material 3-style tokens. Fixed dark palette for now; later these can
+    // be populated by wallpaper-derived colors without changing components.
+    readonly property color primary: "#cbbdff"
+    readonly property color onPrimary: "#30275a"
+    readonly property color primaryContainer: "#4a416f"
+    readonly property color onPrimaryContainer: "#e7deff"
+
+    readonly property color surface: "#121116"
+    readonly property color surfaceContainer: "#1b1a20"
+    readonly property color surfaceContainerHigh: "#252329"
+    readonly property color surfaceContainerHighest: "#302e35"
+    readonly property color onSurface: "#e7e1e9"
+    readonly property color onSurfaceVariant: "#cac4cf"
+    readonly property color outline: "#938f99"
+    readonly property color error: "#ffb4ab"
+
+    // Compatibility aliases while older modules are migrated.
+    readonly property color base: surface
+    readonly property color crust: onPrimary
+    readonly property color surface0: surfaceContainer
+    readonly property color surface1: surfaceContainerHigh
+    readonly property color text: onSurface
+    readonly property color subtext: onSurfaceVariant
+    readonly property color blue: primary
+    readonly property color red: error
+
+    readonly property string font: "Noto Sans"
+    readonly property string mono: "JetBrainsMono Nerd Font"
+
+    readonly property int spacingXS: 4
+    readonly property int spacingS: 8
+    readonly property int spacingM: 12
+    readonly property int spacingL: 16
+    readonly property int spacingXL: 24
+
+    readonly property int radiusSmall: 8
+    readonly property int radius: 14
+    readonly property int radiusLarge: 22
+
+    readonly property int iconSmall: 16
+    readonly property int icon: 20
+    readonly property int iconLarge: 28
 }
