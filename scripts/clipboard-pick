@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+choice="$(cliphist list | rofi -dmenu -i -p Clipboard)" || exit 0
+printf '%s' "$choice" | cliphist decode | wl-copy
