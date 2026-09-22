@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import Quickshell
-import Quickshell.Ipc
+import Quickshell.Io
 import ".."
 
 Scope {
